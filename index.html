@@ -572,15 +572,19 @@ function renderList() {
     const har = cleanNumber(r["2025 YILI HARCAMASI"]);
     const oran = rev > 0 ? Math.round((har / rev) * 100) : 0;
 
-    c.innerHTML = `
-      <h3>${r.__TITLE}</h3>
-      <p><b>İl:</b> ${il} • <b>Yapım:</b> ${yapim}</p>
-      <p>${yuklenici !== "-" ? yuklenici : ""}</p>
-      <p>Rev.Öd.: ${fmt(r["REVİZE ÖDENEK"])} ₺ • Yılı Harc.: ${fmt(r["2025 YILI HARCAMASI"])} ₺ 
-         <span style="color:#0b6954;font-weight:600;">(%${oran})</span></p>`;
-    c.onclick = () => showDetail(r);
-    list.appendChild(c);
-  });
+   c.innerHTML = `
+  <h3>${r.__TITLE}</h3>
+  <p><b>İl:</b> ${il} • <b>Yapım:</b> ${yapim}</p>
+  <p>${yuklenici !== "-" ? yuklenici : ""}</p>
+  <p>
+    Rev.Öd.: ${fmt(r["REVİZE ÖDENEK"])} ₺ • 
+    Yılı Harc.: ${fmt(r["2025 YILI HARCAMASI"])} ₺ 
+    <span style="color:#0b6954;font-weight:600;">(%${oran})</span>
+  </p>
+  <p style="margin-top:-4px;">Bakiye: <b>${fmt(cleanNumber(r["REVİZE ÖDENEK"]) - cleanNumber(r["2025 YILI HARCAMASI"]))} ₺</b></p>`;
+c.onclick = () => showDetail(r);
+list.appendChild(c);
+});
 }
 
 function renderPagination() {
