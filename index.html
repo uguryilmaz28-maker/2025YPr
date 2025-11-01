@@ -475,37 +475,40 @@ function renderCharts() {
   if (barChart) barChart.destroy();
   if (donutChart) donutChart.destroy();
 
-  // 📊 BAR GRAFİK — Değerler sütunların ALTINDA (x ekseninde)
+  // 📊 BAR GRAFİK — Başlık üstte, değer alt satırda
+  const barLabels = [
+    `Revize Ödenek\n(${fmt(rev)} ₺)`,
+    `2025 Harcaması\n(${fmt(har)} ₺)`
+  ];
+
   barChart = new Chart(document.getElementById("barChart"), {
     type: "bar",
-    plugins: [ChartDataLabels],
     data: {
-      labels: ["Revize Ödenek", "2025 Harcaması"],
+      labels: barLabels,
       datasets: [{
         data: [rev, har],
         backgroundColor: ["#0b6954", "#4ab39a"]
       }]
     },
     options: {
-      plugins: {
-        legend: { display: false },
-        datalabels: {
-          color: "#000",
-          anchor: "end",
-          align: "start",   // x ekseni hizasında
-          offset: -25,      // aşağıya çekme (eksi yukarı iter, + aşağı iter)
-          font: { weight: "bold", size: 13 },
-          formatter: v => fmt(v) + " ₺"
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
         y: { beginAtZero: true, ticks: { color: "#345" } },
-        x: { ticks: { color: "#345" } }
+        x: {
+          ticks: {
+            color: "#123",
+            font: { size: 12, weight: "bold" },
+            callback: function(value, index) {
+              const lbl = this.getLabelForValue(index);
+              return lbl.split("\n");
+            }
+          }
+        }
       }
     }
   });
 
-  // 🍩 DONUT GRAFİK — Değerler dilimin TAM İÇİNDE
+  // 🍩 DONUT GRAFİK — Etiketler dilimin TAM İÇİNDE, eğimli, çakışmasız
   donutChart = new Chart(document.getElementById("donutChart"), {
     type: "doughnut",
     plugins: [ChartDataLabels],
@@ -528,10 +531,22 @@ function renderCharts() {
         },
         datalabels: {
           color: "#000",
-          font: { weight: "bold", size: 12 },
-          formatter: v => fmt(v) + " ₺",
+          font: { weight: "bold", size: 11 },
           anchor: "center",
-          align: "center" // tam ortada konumlanır
+          align: "center",
+          offset: -30, // merkeze biraz daha yaklaş
+          rotation: ctx => {
+            // Etiket eğimi: her dilimin orta açısına göre
+            const a = ctx.startAngle + (ctx.endAngle - ctx.startAngle) / 2;
+            return (a * 180 / Math.PI) - 90;
+          },
+          formatter: (v, ctx) => {
+            const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            const percent = total ? (v / total) * 100 : 0;
+            // Küçük dilimlerde gizle
+            if (percent < 8) return "";
+            return fmt(v) + " ₺";
+          }
         }
       },
       cutout: "70%"
