@@ -400,18 +400,31 @@ function renderCharts(){
   });
 }
 
-function renderList(){
-  const list=document.getElementById("list"); list.innerHTML="";
-  const start=(PAGE-1)*PAGE_SIZE; const rows=VIEW.slice(start,start+PAGE_SIZE);
-  rows.forEach(r=>{
-    const c=document.createElement("div"); c.className="card";
-    const il = r["İL ADI"]||r["İLİ"]||"-";
-    const yapim = r["YAPIM ŞEKLİ"]||r["YAPIM SEKLI"]||"-";
+function renderList() {
+  const list = document.getElementById("list"); 
+  list.innerHTML = "";
+  const start = (PAGE - 1) * PAGE_SIZE; 
+  const rows = VIEW.slice(start, start + PAGE_SIZE);
+
+  rows.forEach(r => {
+    const c = document.createElement("div"); 
+    c.className = "card";
+
+    const il = r["İL ADI"] || r["İLİ"] || "-";
+    const yapim = r["YAPIM ŞEKLİ"] || r["YAPIM SEKLI"] || "-";
+    const yuklenici = r["YÜKLENİCİ"] || "-";
+
+    const rev = cleanNumber(r["REVİZE ÖDENEK"]);
+    const har = cleanNumber(r["2025 YILI HARCAMASI"]);
+    const oran = rev > 0 ? Math.round((har / rev) * 100) : 0;
+
     c.innerHTML = `
       <h3>${r.__TITLE}</h3>
       <p><b>İl:</b> ${il} • <b>Yapım:</b> ${yapim}</p>
-      <p>Revize: ${fmt(r["REVİZE ÖDENEK"])} ₺ • 2025: ${fmt(r["2025 YILI HARCAMASI"])} ₺</p>`;
-    c.onclick=()=>showDetail(r);
+      <p>${yuklenici !== "-" ? yuklenici : ""}</p>
+      <p>Rev.Öd.: ${fmt(r["REVİZE ÖDENEK"])} ₺ • Yılı Harc.: ${fmt(r["2025 YILI HARCAMASI"])} ₺ 
+         <span style="color:#0b6954;font-weight:600;">(%${oran})</span></p>`;
+    c.onclick = () => showDetail(r);
     list.appendChild(c);
   });
 }
