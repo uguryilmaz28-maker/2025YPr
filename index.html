@@ -7,6 +7,7 @@
 <link rel="shortcut icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>💧</text></svg>">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <style>
 :root{--dsigreen:#0b6954;--dsigreen-2:#0f7e64;--bg:#f4f7f6;--card:#fff;}
 *{box-sizing:border-box}
@@ -464,25 +465,77 @@ function renderKPIs(){
   document.getElementById("k_sulama").textContent = fmt(sulama);
 }
 
-function renderCharts(){
+function renderCharts() {
   const rows = VIEW;
-  const rev = sumByKeySmart(rows,"REVİZE ÖDENEK");
-  const har = sumByKeySmart(rows,"2025 YILI HARCAMASI");
+  const rev = sumByKeySmart(rows, "REVİZE ÖDENEK");
+  const har = sumByKeySmart(rows, "2025 YILI HARCAMASI");
   const kalan = Math.max(rev - har, 0);
-  const oran = rev ? Math.round((har/rev)*100) : 0;
+  const oran = rev ? Math.round((har / rev) * 100) : 0;
 
-  if(barChart) barChart.destroy();
-  if(donutChart) donutChart.destroy();
+  if (barChart) barChart.destroy();
+  if (donutChart) donutChart.destroy();
 
-  barChart = new Chart(document.getElementById("barChart"),{
-    type:"bar",
-    data:{labels:["Revize","2025"],datasets:[{data:[rev,har],backgroundColor:["#0b6954","#4ab39a"]}]},
-    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  // 📊 BAR GRAFİK — Değerler sütunların ALTINDA (x ekseninde)
+  barChart = new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    plugins: [ChartDataLabels],
+    data: {
+      labels: ["Revize Ödenek", "2025 Harcaması"],
+      datasets: [{
+        data: [rev, har],
+        backgroundColor: ["#0b6954", "#4ab39a"]
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          color: "#000",
+          anchor: "end",
+          align: "start",   // x ekseni hizasında
+          offset: -25,      // aşağıya çekme (eksi yukarı iter, + aşağı iter)
+          font: { weight: "bold", size: 13 },
+          formatter: v => fmt(v) + " ₺"
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: "#345" } },
+        x: { ticks: { color: "#345" } }
+      }
+    }
   });
-  donutChart = new Chart(document.getElementById("donutChart"),{
-    type:"doughnut",
-    data:{labels:["Harcama","Kalan"],datasets:[{data:[har,kalan],backgroundColor:["#0b6954","#ccebe0"]}]},
-    options:{plugins:{legend:{display:false},title:{display:true,text:`%${oran}`,color:"#0b6954",font:{size:20}}},cutout:"70%"}
+
+  // 🍩 DONUT GRAFİK — Değerler dilimin TAM İÇİNDE
+  donutChart = new Chart(document.getElementById("donutChart"), {
+    type: "doughnut",
+    plugins: [ChartDataLabels],
+    data: {
+      labels: ["Harcama", "Kalan"],
+      datasets: [{
+        data: [har, kalan],
+        backgroundColor: ["#0b6954", "#ccebe0"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: "bottom" },
+        title: {
+          display: true,
+          text: `%${oran} Gerçekleşme`,
+          color: "#0b6954",
+          font: { size: 18, weight: "bold" }
+        },
+        datalabels: {
+          color: "#000",
+          font: { weight: "bold", size: 12 },
+          formatter: v => fmt(v) + " ₺",
+          anchor: "center",
+          align: "center" // tam ortada konumlanır
+        }
+      },
+      cutout: "70%"
+    }
   });
 }
 
