@@ -1,0 +1,9 @@
+{
+  "name": "DSİ 2025 Yatırım Programı",
+  "short_name": "DSİ 2025",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0b1b14",
+  "theme_color": "#36a37a",
+  "description": "DSİ 2025 Yatırım Programı – Filtreli, otomatik Sheets verili masaüstü uygulama"
+}
