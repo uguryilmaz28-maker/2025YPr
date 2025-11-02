@@ -191,6 +191,7 @@ header h1{margin:0;font-size:1.2rem;white-space:nowrap}
   <div class="kpi"><div class="t">2025 Yılı Harcaması</div><div class="v" id="k_yiliharcama">–</div></div>
   <div class="kpi"><div class="t">Bakiye</div><div class="v" id="k_bakiye">–</div></div>
   <div class="kpi"><div class="t">2025 Performans Hedefi</div><div class="v" id="k_hedef">–</div></div>
+  <div class="kpi"><div class="t">2025 Açılan Alan</div><div class="v" id="k_acilan2025">–</div></div>
   <div class="kpi"><div class="t">Sulama (ha) Toplamı</div><div class="v" id="k_sulama">–</div></div>
 </section>
 
@@ -463,6 +464,10 @@ function renderKPIs(){
   document.getElementById("k_bakiye").textContent = fmt(bakiye)+" ₺";
   document.getElementById("k_hedef").textContent = fmt(hedef2025);
   document.getElementById("k_sulama").textContent = fmt(sulama);
+// 2025 Açılan Alan (örnek: "2025 AÇILAN ALAN" veya "AÇILAN ALAN 2025" sütununu arar)
+const acilanKey = Object.keys(rows[0] || {}).find(k => normalizeKey(k).includes("2025") && normalizeKey(k).includes("AÇILAN") && normalizeKey(k).includes("ALAN"));
+const acilan2025 = acilanKey ? rows.reduce((a, r) => a + cleanNumber(r[acilanKey]), 0) : 0;
+document.getElementById("k_acilan2025").textContent = fmt(acilan2025) + " ha";
 }
 
 function renderCharts() {
